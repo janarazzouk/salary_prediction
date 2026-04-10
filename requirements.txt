@@ -40,7 +40,6 @@ mmh3==5.2.0
 multidict==6.7.1
 narwhals==2.19.0
 numpy==2.0.2
-ollama==0.6.1
 packaging==25.0
 pandas==2.3.3
 pillow==11.3.0
@@ -90,3 +89,4 @@ uvicorn==0.39.0
 websockets==15.0.1
 yarl==1.22.0
 zipp==3.23.0
+google-genai==1.71.0
