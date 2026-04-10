@@ -91,23 +91,27 @@ st.markdown("""
     }
     .form-card {
         background: #f8f9fa;
-        border-left: 4px solid #0d4f3c;
+        border-left: 5px solid #0F8F67;
     }
     .result-card {
         background: linear-gradient(135deg, #e8f5e8 0%, #f1f8e9 100%);
-        border-left: 4px solid #2e7d32;
+        border-left: 5px solid #0F8F67;
     }
     .insight-card {
         background: #fff3e0;
-        border-left: 4px solid #f57c00;
+        border-left: 5px solid #0F8F67;
     }
     .chart-card {
         background: #e3f2fd;
-        border-left: 4px solid #1976d2;
+        border-left: 5px solid #0F8F67;
     }
     .history-card {
         background: #f3e5f5;
-        border-left: 4px solid #7b1fa2;
+        border-left: 5px solid #0F8F67;
+    }
+    .info-card {
+        background: linear-gradient(135deg, #F0F8FF 0%, #FFFFFF 100%);
+        border-left: 5px solid #0F8F67;
     }
     .metric-value {
         font-size: 2rem;
@@ -121,10 +125,15 @@ st.markdown("""
         letter-spacing: 0.5px;
     }
     .section-title {
-        font-size: 1.5rem;
+        display: inline-block;
+        background: linear-gradient(135deg, #0F8F67 0%, #0B5D46 100%);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 1.2rem;
         font-weight: 600;
-        color: #333;
         margin-bottom: 1rem;
+        box-shadow: 0 2px 8px rgba(15, 143, 103, 0.3);
     }
     .summary-item {
         display: flex;
@@ -343,7 +352,7 @@ def plot_top_job_titles(df: pd.DataFrame, top_n: int = 10):
         .head(top_n)
     )
 
-    fig, ax = plt.subplots(figsize=(10, 6))
+    fig, ax = plt.subplots(figsize=(6, 4))
     ax.barh(chart_df["job_title"], chart_df["salary_in_usd"])
     ax.invert_yaxis()
 
@@ -382,7 +391,7 @@ def plot_job_title_salary_by_country(df: pd.DataFrame, selected_job_title: str, 
 
     chart_df["country_name"] = chart_df["company_location"].map(country_labels).fillna(chart_df["company_location"])
 
-    fig, ax = plt.subplots(figsize=(10, 5))
+    fig, ax = plt.subplots(figsize=(6, 4))
     bars = ax.barh(chart_df["country_name"], chart_df["salary_in_usd"])
     ax.invert_yaxis()
 
@@ -409,7 +418,7 @@ def plot_job_title_salary_by_country(df: pd.DataFrame, selected_job_title: str, 
 # =========================
 # INPUT FORM
 # =========================
-st.markdown('<div class="card form-card"><div class="section-title">📝 Salary Prediction Inputs</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-title">Salary Prediction Inputs</div><div class="card form-card">', unsafe_allow_html=True)
 
 exp_options = ["Entry Level", "Mid Level", "Senior Level", "Executive Level"]
 exp_codes = ["EN", "MI", "SE", "EX"]
@@ -511,7 +520,7 @@ if submitted:
        
 
         # Results Card
-        st.markdown('<div class="card result-card"><div class="section-title">💰 Salary Prediction Results</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-title">Salary Prediction Results</div><div class="card result-card">', unsafe_allow_html=True)
         col1, col2, col3 = st.columns(3)
         with col1:
             st.markdown(f'<div class="metric-value">${predicted_salary:,.0f}</div><div class="metric-label">Predicted Annual Salary (USD)</div>', unsafe_allow_html=True)
@@ -522,7 +531,7 @@ if submitted:
         st.markdown('</div>', unsafe_allow_html=True)
 
         # Input Summary Card
-        st.markdown('<div class="card"><div class="section-title">📋 Input Summary</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-title"> Input Summary</div><div class="card">', unsafe_allow_html=True)
         summary_items = [
             ("Experience Level", experience_level_display),
             ("Employment Type", employment_type_display),
@@ -536,28 +545,30 @@ if submitted:
         st.markdown('</div>', unsafe_allow_html=True)
 
         # AI Insight Card
-        st.markdown('<div class="card insight-card"><div class="section-title">🤖 AI Analyst Insight</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-title"> AI Executive Analysis</div><div class="card insight-card">', unsafe_allow_html=True)
         with st.spinner("Generating AI insight..."):
             insight = generate_llm_insight(payload, predicted_salary)
         st.write(insight)
         st.markdown('</div>', unsafe_allow_html=True)
 
         # Visualization Card
-        st.markdown('<div class="card chart-card"><div class="section-title">📊 Salary Visualization</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-title"> Salary Analytics</div><div class="card chart-card">', unsafe_allow_html=True)
 
+        col_chart1, col_chart2 = st.columns(2)
 
+        with col_chart1:
+            st.subheader("Average Salary by Country for Selected Role")
+            fig_country = plot_job_title_salary_by_country(salary_df, job_title)
 
-        st.subheader("🌍 Average Salary by Country for Selected Role")
-        fig_country = plot_job_title_salary_by_country(salary_df, job_title)
+            if fig_country is not None:
+                st.pyplot(fig_country)
+            else:
+                st.info(f"No country-level salary data found for {job_title}.")
 
-        if fig_country is not None:
-            st.pyplot(fig_country)
-        else:
-            st.info(f"No country-level salary data found for {job_title}.")
-
-        st.subheader("🏆 Top Job Titles by Average Salary")
-        fig_jobs = plot_top_job_titles(salary_df)
-        st.pyplot(fig_jobs)
+        with col_chart2:
+            st.subheader(" Top Job Titles by Average Salary")
+            fig_jobs = plot_top_job_titles(salary_df)
+            st.pyplot(fig_jobs)
 
         st.markdown('</div>', unsafe_allow_html=True)
 
@@ -574,7 +585,7 @@ if submitted:
 # =========================
 # HISTORY SECTION
 # =========================
-st.markdown('<div class="card history-card"><div class="section-title">🗂 Recent Predictions</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-title">Recent Predictions</div><div class="card history-card">', unsafe_allow_html=True)
 
 history_df = load_history()
 
