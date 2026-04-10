@@ -248,7 +248,7 @@ Write a short dashboard insight with this exact structure:
 
 2. Second paragraph:
 - 1 to 2 sentences only
-- Explain which factors are likely influencing the estimate most
+- Explain which factors are likely influencing the estimate most and how it influences it (e.g. "The senior experience level likely supports a higher salary expectation, while the mid-size company factor may pull it down slightly.")
 - Mention experience, location, company size, and remote setup only if relevant
 - Do not just list the inputs again
 
@@ -428,7 +428,7 @@ def plot_job_title_salary_by_country(df: pd.DataFrame, selected_job_title: str, 
     ax.grid(True, axis="x", alpha=0.3)
 
     ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f'{x:,.0f}'))
-    ax.tick_params(axis='x', labelsize=9)
+    ax.tick_params(axis='x', labelsize=7)
 
     for bar in bars:
         width = bar.get_width()
