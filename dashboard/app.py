@@ -223,27 +223,54 @@ def generate_llm_insight(payload: dict, predicted_salary: float) -> str:
         return build_fallback_insight(payload, predicted_salary)
 
     prompt = f"""
-You are a professional data analyst.
+You are writing insight text for a modern salary prediction dashboard.
 
-A salary prediction model estimated the following annual salary in USD:
-{predicted_salary:,.2f}
+Your job is to explain a predicted salary in a way that feels polished, natural, and useful to a non-technical user.
 
-Input details:
+Prediction:
+- Annual salary (USD): ${predicted_salary:,.2f}
+
+Input profile:
+- Job title: {payload['job_title']}
 - Experience level: {payload['experience_level']}
 - Employment type: {payload['employment_type']}
 - Company size: {payload['company_size']}
 - Remote ratio: {payload['remote_ratio']}
 - Company location: {payload['company_location']}
-- Job title: {payload['job_title']}
 
-Write a short narrative analysis in simple professional English.
-Include:
-1. What this salary suggests.
-2. How experience and role may affect the result.
-3. A brief comment on remote work or company/location influence.
-4. End with 2 short bullet-point takeaways.
+Write a short dashboard insight with this exact structure:
 
-Keep it concise and readable.
+1. First paragraph:
+- 2 to 3 sentences only
+- Clearly explain what the predicted salary means
+- Mention the role and experience level naturally
+- Make the wording sound confident, professional, and human
+
+2. Second paragraph:
+- 1 to 2 sentences only
+- Explain which factors are likely influencing the estimate most
+- Mention experience, location, company size, and remote setup only if relevant
+- Do not just list the inputs again
+
+3. Then add:
+Key takeaways
+- bullet 1
+- bullet 2
+
+Writing rules:
+- Use simple professional English
+- Sound like a business dashboard, not like an academic report
+- Be concise but not robotic
+- Avoid phrases like:
+  "this estimate suggests"
+  "market value consistent with"
+  "can influence compensation"
+  "under a FT employment arrangement"
+- Avoid repeating the exact same wording from the inputs
+- Do not be overly cautious or vague
+- Do not invent facts not supported by the input
+- Keep the total output under 120 words
+- Return only the final text, ready to display in the UI
 """
 
     max_retries = 2
@@ -400,7 +427,8 @@ def plot_job_title_salary_by_country(df: pd.DataFrame, selected_job_title: str, 
     ax.set_ylabel("Country")
     ax.grid(True, axis="x", alpha=0.3)
 
-    ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f'${x:,.0f}'))
+    ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f'{x:,.0f}'))
+    ax.tick_params(axis='x', labelsize=9)
 
     for bar in bars:
         width = bar.get_width()
